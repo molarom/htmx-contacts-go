@@ -3,7 +3,7 @@ package app
 import (
 	"net/http"
 
-	validate "gitlab.com/romalor/roxy/stdlib/validator"
+	"gitlab.com/romalor/htmx-contacts/validator"
 )
 
 type Contact struct {
@@ -30,7 +30,7 @@ func parseCreateForm(r *http.Request) (Contact, error) {
 		Email: r.FormValue("email"),
 	}
 
-	if err := validate.Verify(c); err != nil {
+	if err := validator.Verify(c); err != nil {
 		return Contact{}, err
 	}
 	return c, nil

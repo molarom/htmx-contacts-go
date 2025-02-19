@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"sync"
 
-	"gitlab.com/romalor/roxy/stdlib/types/radix"
+	"gitlab.com/romalor/radix"
 )
 
 // Bundle represents a collection of templates that

@@ -7,14 +7,15 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/julienschmidt/httprouter"
 	"gitlab.com/romalor/roxi"
 
-	"gitlab.com/romalor/roxy/app"
-	"gitlab.com/romalor/roxy/stdlib/tpl"
+	"gitlab.com/romalor/htmx-contacts/app"
+	"gitlab.com/romalor/htmx-contacts/debug"
+	"gitlab.com/romalor/htmx-contacts/tpl"
 )
 
 func main() {
+	go RunDebugServer()
 	RunRoxiServer()
 }
 
@@ -37,41 +38,21 @@ func RunRoxiServer() {
 		roxi.WithOptionsHandler(roxi.HandlerFunc(roxi.DefaultCORS)),
 	)
 
-	// mux.Handler("GET", "/static", http.StripPrefix("/static", http.FileServerFS(os.DirFS("static"))))
+	mux.FileServer("/static/*file", http.FS(os.DirFS("static")))
 
 	app.Routes(mux, appConfig())
-	mux.PrintRoutes()
+	mux.PrintTree()
 
-	runServer(mux)
+	runServer(mux, "8080")
 }
 
-func RunStdServer() {
-	mux := http.NewServeMux()
-
-	// app.StdRoutes(mux, appConfig())
-
-	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(204)
-	})
-
-	runServer(mux)
+func RunDebugServer() {
+	runServer(debug.Mux(), "9000")
 }
 
-func RunHTTPRouter() {
-	mux := httprouter.New()
-	mux.RedirectTrailingSlash = false
-	mux.RedirectFixedPath = false
-
-	mux.GET("/", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		w.WriteHeader(204)
-	})
-
-	runServer(mux)
-}
-
-func runServer(h http.Handler) {
+func runServer(h http.Handler, port string) {
 	srv := &http.Server{
-		Addr:    ":8080",
+		Addr:    ":" + port,
 		Handler: h,
 	}
 

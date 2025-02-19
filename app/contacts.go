@@ -1,16 +1,14 @@
 package app
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
-	"gitlab.com/romalor/roxy/stdlib/tpl"
+	"gitlab.com/romalor/htmx-contacts/tpl"
 )
 
 type handlers struct {
-	tpls *tpl.Bundle
-	// TODO: make contact store
+	tpls         *tpl.Bundle
 	contactStore Contacts
 }
 
@@ -19,7 +17,6 @@ func (h *handlers) Home(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handlers) List(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(r.URL.Path)
 	h.tpls.Render(w, "index.html", ListPage{
 		r.URL.Query().Get("q"),
 		h.contactStore,

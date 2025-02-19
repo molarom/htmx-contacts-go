@@ -5,7 +5,7 @@ import (
 
 	"gitlab.com/romalor/roxi"
 
-	"gitlab.com/romalor/roxy/stdlib/tpl"
+	"gitlab.com/romalor/htmx-contacts/tpl"
 )
 
 type Config struct {
