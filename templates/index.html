@@ -1,0 +1,31 @@
+{{ define "content" }}
+<form action="/contacts" method="get" class="tool-bar">
+    <label for="search">Search Term</label>
+    <input id="search" type="search" name="q" value="{{ .Search }}">
+    <input type="submit" value="Search"> 
+</form>
+<table>
+    <thead>
+        <tr>
+            <th>First <th>Last <th>Phone <th> Email</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ range $v := .Contacts }}
+        <tr>
+            <td>{{ $v.First }}</td>
+            <td>{{ $v.Last }}</td>
+            <td>{{ $v.Phone }}</td>
+            <td>{{ $v.Email }}</td>
+            <td>
+                <a href="/contacts/{{ $v.Id }}/edit">Edit</a>
+                <a href="/contacts/{{ $v.Id }}">View</a>
+            </td>
+        </tr>
+        {{ end }}
+    </tbody>
+</table>
+<p>
+    <a href="/contacts/new">Add Contact</a>
+</p>
+{{ end }}
