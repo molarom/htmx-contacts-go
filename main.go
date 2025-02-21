@@ -33,9 +33,9 @@ func appConfig() app.Config {
 }
 
 func RunRoxiServer() {
-	mux := roxi.New(
+	mux := roxi.NewWithDefaults(
 		roxi.WithLogger(slog.New(slog.Default().Handler()).Info),
-		roxi.WithOptionsHandler(roxi.HandlerFunc(roxi.DefaultCORS)),
+		roxi.WithOptionsHandler(roxi.DefaultCORS),
 	)
 
 	mux.FileServer("/static/*file", http.FS(os.DirFS("static")))

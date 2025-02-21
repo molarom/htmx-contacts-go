@@ -1,0 +1,56 @@
+{{ define "content" }}
+<form action="/contacts/{{ .contact.Id }}/edit" method="post">
+    <fieldset>
+        <legend>Contact Values</legend>
+        <p>
+            <label for="email">Email</label>
+            <input type="email" name="email" 
+            placeholder="Email" value="{{ .contact.Email }}">
+            <span class="error">
+            {{ with .errors  }}
+                {{ .Email }}
+            {{ end }}
+            </span>
+        </p>
+        <p>
+            <label for="first_name">First Name</label>
+            <input name="first_name" id="first_name" type="text"
+            placeholder="First Name" value="{{ .contact.First }}">
+            <span class="error">
+            {{ with .errors }}
+                {{ .First }}
+            {{ end }}
+            </span>
+        </p>
+        <p>
+            <label for="last_name">Last Name</label>
+            <input name="last_name" id="last_name" type="text"
+                placeholder="Last Name" value="{{ .contact.Last }}">
+            <span class="error">
+            {{ with .errors }}
+                {{ .Last }}
+            {{ end }}
+            </span>
+        </p>
+        <p>
+        <label for="phone">Phone</label>
+            <input name="phone" id="phone" type="text" placeholder="Phone"
+                value="{{ .contact.Phone }}">
+            <span class="error">
+            {{ with .errors }}
+                {{ .Phone }}
+            {{ end }}
+            </span>
+        </p>
+        <button>Save</button>
+    </fieldset>
+</form>
+
+<form action="/contacts/{{ .contact.Id }}/delete" method="post">
+  <button>Delete Contact</button>
+</form>
+
+<p>
+  <a href="/contacts/">Back</a>
+</p>
+{{ end }}

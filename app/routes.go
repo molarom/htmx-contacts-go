@@ -18,9 +18,11 @@ func Routes(mux *roxi.Mux, cfg Config) {
 		cfg.ContactStore,
 		sessions.NewCookieStore([]byte("securestring")),
 	}
-	mux.Handle("GET", "/", h.Home)
-	mux.Handle("GET", "/contacts", h.List)
-	mux.Handle("GET", "/contacts/new", h.New)
-	mux.Handle("GET", "/contacts/view/:contact_id", h.View)
-	mux.Handle("POST", "/contacts/new", h.Create)
+	mux.GET("/", h.Home)
+	mux.GET("/contacts", h.List)
+	mux.GET("/contacts/new", h.New)
+	mux.POST("/contacts/new", h.Create)
+	mux.GET("/contacts/view/:contact_id", h.View)
+	mux.GET("/contacts/:contact_id/edit", h.Edit)
+	mux.POST("/contacts/:contact_id/edit", h.Update)
 }
