@@ -122,7 +122,7 @@ func (h *handlers) Update(ctx context.Context, r *http.Request) error {
 	if err != nil {
 		return h.tpls.Render(roxi.GetWriter(ctx), "edit.html", tpl.Data{
 			"contact": Contact{},
-			"errorl":  err,
+			"error":   err,
 		})
 	}
 	uc.Id = int(id)
@@ -135,7 +135,32 @@ func (h *handlers) Update(ctx context.Context, r *http.Request) error {
 		break
 	}
 
-	session.AddFlash(err)
+	session.AddFlash("Updated Contact!")
 	session.Save(r, roxi.GetWriter(ctx))
 	return roxi.Redirect(ctx, r, "/contacts/view/"+r.PathValue("contact_id"), http.StatusMovedPermanently)
+}
+
+func (h *handlers) Delete(ctx context.Context, r *http.Request) error {
+	session, err := h.session.Get(r, strings.Split(r.RemoteAddr, ":")[0])
+	if err != nil {
+		return err
+	}
+
+	id, err := strconv.ParseInt(r.PathValue("contact_id"), 10, 64)
+	if err != nil {
+		return err
+	}
+	for i, c := range h.contactStore {
+		if c.Id != int(id) {
+			continue
+		}
+		copy(h.contactStore[i:], h.contactStore[i+1:])
+		h.contactStore[len(h.contactStore)-1] = Contact{}
+		h.contactStore = h.contactStore[:len(h.contactStore)-1]
+
+		session.AddFlash("Deleted Contact!")
+		session.Save(r, roxi.GetWriter(ctx))
+	}
+
+	return roxi.Redirect(ctx, r, "/contacts/", http.StatusMovedPermanently)
 }
