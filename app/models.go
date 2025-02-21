@@ -7,12 +7,11 @@ import (
 )
 
 type Contact struct {
-	Id     int    `json:"id"`
-	First  string `json:"first" validate:"required"`
-	Last   string `json:"last" validate:"required"`
-	Phone  string `json:"phone" validate:"required"`
-	Email  string `json:"email" validate:"required,email"`
-	Errors error  `json:"-"`
+	Id    int    `json:"id"`
+	First string `json:"first" validate:"required"`
+	Last  string `json:"last" validate:"required"`
+	Phone string `json:"phone" validate:"required"`
+	Email string `json:"email" validate:"required,email"`
 }
 
 type Contacts []Contact

@@ -19,6 +19,8 @@ type Bundle struct {
 	pool sync.Pool
 }
 
+type Data map[string]any
+
 // TODO: improve error handling, over just panicing
 func NewBundle(baseTpl, layoutDir, contentDir string) *Bundle {
 	b := &Bundle{
@@ -53,7 +55,7 @@ func NewBundle(baseTpl, layoutDir, contentDir string) *Bundle {
 	return b
 }
 
-func (b *Bundle) Render(w http.ResponseWriter, name string, data any) error {
+func (b *Bundle) Render(w http.ResponseWriter, name string, data Data) error {
 	t, ok := b.tree.Get([]byte(name))
 	if !ok {
 		return fmt.Errorf("render: %s not a valid template", name)

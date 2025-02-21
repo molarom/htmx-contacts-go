@@ -1,8 +1,7 @@
 package app
 
 import (
-	"net/http"
-
+	"github.com/gorilla/sessions"
 	"gitlab.com/romalor/roxi"
 
 	"gitlab.com/romalor/htmx-contacts/tpl"
@@ -17,22 +16,11 @@ func Routes(mux *roxi.Mux, cfg Config) {
 	h := &handlers{
 		cfg.TplBundle,
 		cfg.ContactStore,
+		sessions.NewCookieStore([]byte("securestring")),
 	}
-	mux.HandlerFunc("GET", "/", h.Home)
-	mux.HandlerFunc("GET", "/contacts", h.List)
-	mux.HandlerFunc("GET", "/contacts/new", h.New)
-	mux.HandlerFunc("GET", "/contacts/view/:contact_id", h.View)
-	mux.HandlerFunc("POST", "/contacts/new", h.Create)
-}
-
-func StdRoutes(mux *http.ServeMux, cfg Config) {
-	h := &handlers{
-		cfg.TplBundle,
-		cfg.ContactStore,
-	}
-	mux.HandleFunc("GET /", h.Home)
-	mux.HandleFunc("GET /contacts", h.List)
-	mux.HandleFunc("GET /contacts/new", h.New)
-	mux.HandleFunc("GET /contacts/view/:contact_id", h.View)
-	mux.HandleFunc("POST /contacts/new", h.Create)
+	mux.Handle("GET", "/", h.Home)
+	mux.Handle("GET", "/contacts", h.List)
+	mux.Handle("GET", "/contacts/new", h.New)
+	mux.Handle("GET", "/contacts/view/:contact_id", h.View)
+	mux.Handle("POST", "/contacts/new", h.Create)
 }

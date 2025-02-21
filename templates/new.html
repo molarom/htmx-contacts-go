@@ -5,9 +5,9 @@
         <p>
             <label for="email">Email</label>
             <input type="email" name="email" 
-            placeholder="Email" value="{{ .Email }}">
+            placeholder="Email" value="{{ .contact.Email }}">
             <span class="error">
-            {{ with .Errors  }}
+            {{ with .errors  }}
                 {{ .Email }}
             {{ end }}
             </span>
@@ -15,9 +15,9 @@
         <p>
             <label for="first_name">First Name</label>
             <input name="first_name" id="first_name" type="text"
-            placeholder="First Name" value="{{ .First }}">
+            placeholder="First Name" value="{{ .contact.First }}">
             <span class="error">
-            {{ with .Errors }}
+            {{ with .errors }}
                 {{ .First }}
             {{ end }}
             </span>
@@ -25,9 +25,9 @@
         <p>
             <label for="last_name">Last Name</label>
             <input name="last_name" id="last_name" type="text"
-                placeholder="Last Name" value="{{ .Last }}">
+                placeholder="Last Name" value="{{ .contact.Last }}">
             <span class="error">
-            {{ with .Errors }}
+            {{ with .errors }}
                 {{ .Last }}
             {{ end }}
             </span>
@@ -35,9 +35,9 @@
         <p>
         <label for="phone">Phone</label>
             <input name="phone" id="phone" type="text" placeholder="Phone"
-                value="{{ .Phone }}">
+                value="{{ .contact.Phone }}">
             <span class="error">
-            {{ with .Errors }}
+            {{ with .errors }}
                 {{ .Phone }}
             {{ end }}
             </span>

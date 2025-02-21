@@ -1,8 +1,13 @@
 package app
 
 import (
+	"context"
 	"net/http"
 	"strconv"
+	"strings"
+
+	"github.com/gorilla/sessions"
+	"gitlab.com/romalor/roxi"
 
 	"gitlab.com/romalor/htmx-contacts/tpl"
 )
@@ -10,48 +15,75 @@ import (
 type handlers struct {
 	tpls         *tpl.Bundle
 	contactStore Contacts
+	session      sessions.Store
 }
 
-func (h *handlers) Home(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "/contacts", http.StatusMovedPermanently)
+func (h *handlers) Home(ctx context.Context, r *http.Request) error {
+	session, err := h.session.New(r, strings.Split(r.RemoteAddr, ":")[0])
+	if err != nil {
+		return err
+	}
+
+	session.Save(r, roxi.GetWriter(ctx))
+	return roxi.Redirect(ctx, r, "/contacts", http.StatusMovedPermanently)
 }
 
-func (h *handlers) List(w http.ResponseWriter, r *http.Request) {
-	h.tpls.Render(w, "index.html", ListPage{
-		r.URL.Query().Get("q"),
-		h.contactStore,
+func (h *handlers) List(ctx context.Context, r *http.Request) error {
+	session, err := h.session.Get(r, strings.Split(r.RemoteAddr, ":")[0])
+	if err != nil {
+		return err
+	}
+
+	return h.tpls.Render(roxi.GetWriter(ctx), "index.html", tpl.Data{
+		"contacts": h.contactStore,
+		"flashes":  session.Flashes(),
 	})
 }
 
-func (h *handlers) New(w http.ResponseWriter, r *http.Request) {
-	h.tpls.Render(w, "new.html", Contact{})
+func (h *handlers) New(ctx context.Context, r *http.Request) error {
+	return h.tpls.Render(roxi.GetWriter(ctx), "new.html", tpl.Data{
+		"contact": Contact{},
+		"errors":  nil,
+	})
 }
 
-func (h *handlers) Create(w http.ResponseWriter, r *http.Request) {
+func (h *handlers) Create(ctx context.Context, r *http.Request) error {
+	session, err := h.session.Get(r, strings.Split(r.RemoteAddr, ":")[0])
+	if err != nil {
+		return err
+	}
+
 	c, err := parseCreateForm(r)
 	if err != nil {
-		h.tpls.Render(w, "new.html", Contact{Errors: err})
-		return
+		return h.tpls.Render(roxi.GetWriter(ctx), "new.html", tpl.Data{
+			"contact": Contact{},
+			"errors":  err,
+		})
 	}
 
 	c.Id = len(h.contactStore) + 1
 	h.contactStore = append(h.contactStore, c)
 
-	http.Redirect(w, r, "/contacts", http.StatusMovedPermanently)
+	session.AddFlash("Created New Contact!")
+	session.Save(r, roxi.GetWriter(ctx))
+	return roxi.Redirect(ctx, r, "/contacts", http.StatusMovedPermanently)
 }
 
-func (h *handlers) View(w http.ResponseWriter, r *http.Request) {
+func (h *handlers) View(ctx context.Context, r *http.Request) error {
 	id, err := strconv.ParseInt(r.PathValue("contact_id"), 10, 64)
 	if err != nil {
-		return
+		return err
 	}
 
-	contact := Contact{}
 	for _, c := range h.contactStore {
-		if c.Id == int(id) {
-			contact = c
+		if c.Id != int(id) {
+			continue
 		}
+		return h.tpls.Render(roxi.GetWriter(ctx), "show.html", tpl.Data{
+			"contact": c,
+		})
 	}
-
-	h.tpls.Render(w, "show.html", contact)
+	return h.tpls.Render(roxi.GetWriter(ctx), "show.html", tpl.Data{
+		"contact": Contact{},
+	})
 }
