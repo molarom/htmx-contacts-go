@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"log/slog"
 	"net/http"
@@ -11,6 +10,7 @@ import (
 
 	"gitlab.com/romalor/htmx-contacts/app"
 	"gitlab.com/romalor/htmx-contacts/debug"
+	"gitlab.com/romalor/htmx-contacts/stores/contacts"
 	"gitlab.com/romalor/htmx-contacts/tpl"
 )
 
@@ -20,15 +20,12 @@ func main() {
 }
 
 func appConfig() app.Config {
-	db, err := os.ReadFile("contacts.json")
+	s, err := contacts.NewStore("contacts.json")
 	handleErr(err)
 
-	var contacts app.Contacts
-	handleErr(json.Unmarshal(db, &contacts))
-
 	return app.Config{
-		TplBundle:    tpl.NewBundle("base", "templates/layouts/*.html", "templates/*.html"),
-		ContactStore: contacts,
+		TplBundle: tpl.NewBundle("base", "templates/layouts/*.html", "templates/*.html"),
+		Store:     s,
 	}
 }
 
@@ -41,7 +38,7 @@ func RunRoxiServer() {
 	mux.FileServer("/static/*file", http.FS(os.DirFS("static")))
 
 	app.Routes(mux, appConfig())
-	// mux.PrintTree()
+	mux.PrintTree()
 
 	runServer(mux, "8080")
 }

@@ -46,8 +46,8 @@ func NewBundle(baseTpl, layoutDir, contentDir string) *Bundle {
 	for _, v := range views {
 		f := append(layouts, v)
 		b.tree.Insert([]byte(filepath.Base(v)),
-			template.Must(template.ParseFiles(
-				f...),
+			template.Must(
+				template.New(f[0]).Funcs(funcs).ParseFiles(f...),
 			),
 		)
 	}

@@ -3,26 +3,12 @@ package app
 import (
 	"net/http"
 
+	"gitlab.com/romalor/htmx-contacts/stores/contacts"
 	"gitlab.com/romalor/htmx-contacts/validator"
 )
 
-type Contact struct {
-	Id    int    `json:"id"`
-	First string `json:"first" validate:"required"`
-	Last  string `json:"last" validate:"required"`
-	Phone string `json:"phone" validate:"required"`
-	Email string `json:"email" validate:"required,email"`
-}
-
-type Contacts []Contact
-
-type ListPage struct {
-	Search   string
-	Contacts Contacts
-}
-
-func parseCreateForm(r *http.Request) (Contact, error) {
-	c := Contact{
+func parseCreateForm(r *http.Request) (contacts.Contact, error) {
+	c := contacts.Contact{
 		First: r.FormValue("first_name"),
 		Last:  r.FormValue("last_name"),
 		Phone: r.FormValue("phone"),
@@ -30,7 +16,13 @@ func parseCreateForm(r *http.Request) (Contact, error) {
 	}
 
 	if err := validator.Verify(c); err != nil {
-		return Contact{}, err
+		return contacts.Contact{}, err
 	}
 	return c, nil
+}
+
+type Resp []byte
+
+func (r Resp) Response() ([]byte, string, error) {
+	return r, "text/plain; charset=utf-8", nil
 }

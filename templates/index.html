@@ -28,4 +28,14 @@
 <p>
     <a href="/contacts/new">Add Contact</a>
 </p>
+<div>
+    <span style="float: right">
+        {{ if gt .page 1 }}
+        <a href="/contacts?page={{ sub .page 1 }}">Previous</a>
+        {{ end }}
+        {{ if eq (len .contacts) 10 }}
+        <a href="/contacts?page={{ add .page 1 }}">Next</a>
+        {{ end }}
+    </span>
+</div>
 {{ end }}

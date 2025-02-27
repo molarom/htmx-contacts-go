@@ -5,6 +5,9 @@
         <p>
             <label for="email">Email</label>
             <input type="email" name="email" 
+            hx-get="/contacts/email"
+            hx-target="next .error"
+            hx-trigger="change, keyup delay:200ms changed"
             placeholder="Email" value="{{ .contact.Email }}">
             <span class="error">
             {{ with .errors  }}
