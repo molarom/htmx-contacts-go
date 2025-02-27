@@ -41,7 +41,7 @@ func RunRoxiServer() {
 	mux.FileServer("/static/*file", http.FS(os.DirFS("static")))
 
 	app.Routes(mux, appConfig())
-	mux.PrintTree()
+	// mux.PrintTree()
 
 	runServer(mux, "8080")
 }
