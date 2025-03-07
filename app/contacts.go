@@ -2,13 +2,13 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"strconv"
 
 	"gitlab.com/romalor/roxi"
 
 	"gitlab.com/romalor/htmx-contacts/flash"
+	"gitlab.com/romalor/htmx-contacts/middleware/htmx"
 	"gitlab.com/romalor/htmx-contacts/stores/contacts"
 	"gitlab.com/romalor/htmx-contacts/tpl"
 )
@@ -19,7 +19,6 @@ type handlers struct {
 }
 
 func (h *handlers) Home(ctx context.Context, r *http.Request) error {
-	fmt.Println("here")
 	return roxi.Redirect(ctx, r, "/contacts", http.StatusMovedPermanently)
 }
 
@@ -33,9 +32,18 @@ func (h *handlers) List(ctx context.Context, r *http.Request) error {
 	if err != nil {
 		return err
 	}
+
+	var contacts contacts.Contacts
+	if q := r.URL.Query().Get("q"); q != "" {
+		contacts = h.store.Search(q)
+		if htmx.Get(ctx).Trigger == "search" {
+		}
+	} else {
+		contacts = h.store.Page(p)
+	}
 	return h.tpls.Render(roxi.GetWriter(ctx), "index.html", tpl.Data{
-		"contacts": h.store.Page(p),
 		"flashes":  flash.Messages(roxi.GetWriter(ctx), r),
+		"contacts": contacts,
 		"page":     p,
 	})
 }

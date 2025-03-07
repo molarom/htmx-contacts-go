@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 )
 
 type Contact struct {
@@ -35,22 +36,28 @@ func NewStore(file string) (*Store, error) {
 }
 
 func (s *Store) Page(p int) Contacts {
-	fmt.Println("p", p)
-	if p <= 1 {
-		return s.c[:10]
-	}
-
 	l := len(s.c)
-	start := p * 10
-	if start > l {
-		return s.c[l-10:]
-	}
-
-	end := (p + 1) * 10
-
-	fmt.Println(min(end, l))
+	start := (p - 1) * 10
+	end := start + 10
 
 	return s.c[start:min(end, l)]
+}
+
+func (s *Store) Search(text string) Contacts {
+	cs := make(Contacts, 0, 10)
+	for _, c := range s.c {
+		switch {
+		case strings.Contains(c.First, text):
+			cs = append(cs, c)
+		case strings.Contains(c.Last, text):
+			cs = append(cs, c)
+		case strings.Contains(c.Email, text):
+			cs = append(cs, c)
+		case strings.Contains(c.Phone, text):
+			cs = append(cs, c)
+		}
+	}
+	return cs
 }
 
 func (s *Store) Create(c Contact) error {

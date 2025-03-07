@@ -1,0 +1,14 @@
+{{ define "rows.html" }}
+{{ range $v := .contacts }}
+<tr>
+    <td>{{ $v.First }}</td>
+    <td>{{ $v.Last }}</td>
+    <td>{{ $v.Phone }}</td>
+    <td>{{ $v.Email }}</td>
+    <td>
+        <a href="/contacts/{{ $v.Id }}/edit">Edit</a>
+        <a href="/contacts/view/{{ $v.Id }}">View</a>
+    </td>
+</tr>
+{{ end }}
+{{ end }}

@@ -8,8 +8,8 @@ require (
 	github.com/go-playground/universal-translator v0.18.1
 	github.com/go-playground/validator/v10 v10.25.0
 	github.com/gorilla/sessions v1.4.0
-	gitlab.com/romalor/radix v0.0.0-20250214035112-1aa5dd24de62
-	gitlab.com/romalor/roxi v0.0.3
+	gitlab.com/romalor/radix v0.0.0-20250227130228-6bb7bae486df
+	gitlab.com/romalor/roxi v1.0.0
 )
 
 require (
@@ -18,7 +18,9 @@ require (
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	golang.org/x/crypto v0.35.0 // indirect
-	golang.org/x/net v0.35.0 // indirect
+	golang.org/x/net v0.36.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
 )
+
+replace gitlab/romalor/roxi v1.0.0 => ../roxi

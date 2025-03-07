@@ -10,6 +10,8 @@ import (
 
 	"gitlab.com/romalor/htmx-contacts/app"
 	"gitlab.com/romalor/htmx-contacts/debug"
+	"gitlab.com/romalor/htmx-contacts/middleware/htmx"
+	"gitlab.com/romalor/htmx-contacts/middleware/logging"
 	"gitlab.com/romalor/htmx-contacts/stores/contacts"
 	"gitlab.com/romalor/htmx-contacts/tpl"
 )
@@ -30,9 +32,11 @@ func appConfig() app.Config {
 }
 
 func RunRoxiServer() {
+	log := slog.New(slog.Default().Handler()).Info
 	mux := roxi.NewWithDefaults(
-		roxi.WithLogger(slog.New(slog.Default().Handler()).Info),
+		roxi.WithLogger(log),
 		roxi.WithOptionsHandler(roxi.DefaultCORS),
+		roxi.WithMiddleware(logging.Logging(log), htmx.HTMX),
 	)
 
 	mux.FileServer("/static/*file", http.FS(os.DirFS("static")))

@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"net/http"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"gitlab.com/romalor/radix"
@@ -21,7 +22,6 @@ type Bundle struct {
 
 type Data map[string]any
 
-// TODO: improve error handling, over just panicing
 func NewBundle(baseTpl, layoutDir, contentDir string) *Bundle {
 	b := &Bundle{
 		base: baseTpl,
@@ -65,11 +65,26 @@ func (b *Bundle) Render(w http.ResponseWriter, name string, data Data) error {
 	buf.Reset()
 	defer b.pool.Put(buf)
 
-	if err := t.ExecuteTemplate(buf, b.base, data); err != nil {
+	f := template.FuncMap{
+		"include": func(name string) (string, error) {
+			v, ok := b.tree.Get([]byte(name))
+			if !ok {
+				return "", fmt.Errorf("no template named: %s", name)
+			}
+
+			var w *strings.Builder
+			if err := v.New(name).ExecuteTemplate(w, name, data); err != nil {
+				return "", err
+			}
+			return w.String(), nil
+		},
+	}
+
+	if err := t.Funcs(f).ExecuteTemplate(buf, b.base, data); err != nil {
 		return err
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	w.Write(buf.Bytes())
-	return nil
+	_, err := w.Write(buf.Bytes())
+	return err
 }
