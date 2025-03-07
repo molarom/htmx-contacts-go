@@ -1,4 +1,3 @@
-{{ define "rows.html" }}
 {{ range $v := .contacts }}
 <tr>
     <td>{{ $v.First }}</td>
@@ -10,5 +9,4 @@
         <a href="/contacts/view/{{ $v.Id }}">View</a>
     </td>
 </tr>
-{{ end }}
 {{ end }}

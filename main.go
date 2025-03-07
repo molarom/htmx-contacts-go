@@ -26,8 +26,12 @@ func appConfig() app.Config {
 	handleErr(err)
 
 	return app.Config{
-		TplBundle: tpl.NewBundle("base", "templates/layouts/*.html", "templates/*.html"),
-		Store:     s,
+		TplBundle: tpl.NewBundle("base",
+			"templates/*.html",
+			"templates/layouts/*.html",
+			"templates/components/*.html",
+		),
+		Store: s,
 	}
 }
 
