@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"log/slog"
 	"net/http"
@@ -10,6 +11,7 @@ import (
 
 	"gitlab.com/romalor/htmx-contacts/app"
 	"gitlab.com/romalor/htmx-contacts/debug"
+	"gitlab.com/romalor/htmx-contacts/middleware/errs"
 	"gitlab.com/romalor/htmx-contacts/middleware/htmx"
 	"gitlab.com/romalor/htmx-contacts/middleware/logging"
 	"gitlab.com/romalor/htmx-contacts/stores/contacts"
@@ -40,13 +42,19 @@ func RunRoxiServer() {
 	mux := roxi.NewWithDefaults(
 		roxi.WithLogger(log),
 		roxi.WithOptionsHandler(roxi.DefaultCORS),
-		roxi.WithMiddleware(logging.Logging(log), htmx.HTMX),
+		roxi.WithMiddleware(
+			logging.Logging(log),
+			errs.Errors(log),
+			htmx.HTMX),
 	)
 
 	mux.FileServer("/static/*file", http.FS(os.DirFS("static")))
 
+	cfg := appConfig()
 	app.Routes(mux, appConfig())
 	mux.PrintTree()
+	fmt.Println("-----------------------")
+	cfg.TplBundle.Print()
 
 	runServer(mux, "8080")
 }

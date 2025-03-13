@@ -63,6 +63,17 @@ func NewBundle(baseTpl, viewsDir string, sharedDirs ...string) *Bundle {
 		)
 	}
 
+	// TODO: tidy up tpl inheritance config.
+	for _, s := range shared {
+		for _, f := range s {
+			b.tree.Insert([]byte(filepath.Base(f)),
+				template.Must(
+					template.New(f).Funcs(funcs).ParseFiles(f),
+				),
+			)
+		}
+	}
+
 	return b
 }
 
@@ -83,4 +94,8 @@ func (b *Bundle) Render(w http.ResponseWriter, name string, data Data) error {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	_, err := w.Write(buf.Bytes())
 	return err
+}
+
+func (b *Bundle) Print() {
+	b.tree.Print()
 }

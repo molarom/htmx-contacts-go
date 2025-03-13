@@ -37,6 +37,11 @@ func (h *handlers) List(ctx context.Context, r *http.Request) error {
 	if q := r.URL.Query().Get("q"); q != "" {
 		contacts = h.store.Search(q)
 		if htmx.Get(ctx).Trigger == "search" {
+			return h.tpls.Render(roxi.GetWriter(ctx), "rows.html", tpl.Data{
+				"flashes":  flash.Messages(roxi.GetWriter(ctx), r),
+				"contacts": contacts,
+				"page":     p,
+			})
 		}
 	} else {
 		contacts = h.store.Page(p)
