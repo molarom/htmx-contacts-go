@@ -35,6 +35,10 @@ func NewStore(file string) (*Store, error) {
 	return s, nil
 }
 
+func (s *Store) Count() int {
+	return len(s.c)
+}
+
 func (s *Store) Page(p int) Contacts {
 	l := len(s.c)
 	start := (p - 1) * 10

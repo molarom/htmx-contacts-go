@@ -19,11 +19,13 @@ func Routes(mux *roxi.Mux, cfg Config) {
 	}
 	mux.GET("/", h.Home)
 	mux.GET("/contacts", h.List)
+	mux.GET("/contacts/count", h.Count)
 	mux.GET("/contacts/new", h.New)
 	mux.POST("/contacts/new", h.Create)
 	mux.GET("/contacts/email", h.Email)
 	mux.GET("/contacts/view/:contact_id", h.View)
 	mux.GET("/contacts/:contact_id/edit", h.Edit)
 	mux.POST("/contacts/:contact_id/edit", h.Update)
-	mux.DELETE("/contacts/:contact_id/delete", h.Delete)
+	mux.DELETE("/contacts/:contact_id", h.Delete)
+	mux.DELETE("/contacts", h.Deletes)
 }

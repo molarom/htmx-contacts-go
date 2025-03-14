@@ -44,8 +44,9 @@ func RunRoxiServer() {
 		roxi.WithOptionsHandler(roxi.DefaultCORS),
 		roxi.WithMiddleware(
 			logging.Logging(log),
+			htmx.HTMX,
 			errs.Errors(log),
-			htmx.HTMX),
+		),
 	)
 
 	mux.FileServer("/static/*file", http.FS(os.DirFS("static")))

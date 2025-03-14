@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -51,6 +52,11 @@ func (h *handlers) List(ctx context.Context, r *http.Request) error {
 		"contacts": contacts,
 		"page":     p,
 	})
+}
+
+func (h *handlers) Count(ctx context.Context, r *http.Request) error {
+	resp := Resp(fmt.Sprintf("(%d total Contacts)", h.store.Count()))
+	return roxi.Respond(ctx, resp)
 }
 
 func (h *handlers) New(ctx context.Context, r *http.Request) error {
@@ -140,9 +146,29 @@ func (h *handlers) Delete(ctx context.Context, r *http.Request) error {
 		return err
 	}
 
-	if ok := h.store.Delete(int(id)); ok {
-		flash.Add(roxi.GetWriter(ctx), r, "Deleted Contact!")
+	if htmx.Get(ctx).Trigger == "delete-btn" {
+		if ok := h.store.Delete(int(id)); ok {
+			flash.Add(roxi.GetWriter(ctx), r, "Deleted Contact!")
+		}
+		return roxi.Redirect(ctx, r, "/contacts/", http.StatusSeeOther)
+	}
+	return roxi.Respond(ctx, Resp(""))
+}
+
+func (h *handlers) Deletes(ctx context.Context, r *http.Request) error {
+	qp, err := parseDeletesParams(r)
+	if err != nil {
+		return err
 	}
 
-	return roxi.Redirect(ctx, r, "/contacts/", http.StatusSeeOther)
+	for _, id := range qp.ids {
+		_ = h.store.Delete(id)
+	}
+	flash.Add(roxi.GetWriter(ctx), r, "Deleted Contacts!")
+
+	return h.tpls.Render(roxi.GetWriter(ctx), "index.html", tpl.Data{
+		"flashes":  flash.Messages(roxi.GetWriter(ctx), r),
+		"contacts": h.store.Page(1),
+		"page":     1,
+	})
 }

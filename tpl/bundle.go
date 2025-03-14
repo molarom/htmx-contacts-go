@@ -87,7 +87,11 @@ func (b *Bundle) Render(w http.ResponseWriter, name string, data Data) error {
 	buf.Reset()
 	defer b.pool.Put(buf)
 
-	if err := t.ExecuteTemplate(buf, b.base, data); err != nil {
+	tpl := name
+	if t.Lookup(b.base) != nil {
+		tpl = b.base
+	}
+	if err := t.ExecuteTemplate(buf, tpl, data); err != nil {
 		return err
 	}
 
