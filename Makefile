@@ -6,3 +6,8 @@ tidy:
 
 test:
 	CGO_ENABLED=0 go test -v ./...
+
+lint:
+	golangci-lint run ./...
+
+

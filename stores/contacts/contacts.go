@@ -2,7 +2,7 @@ package contacts
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"os"
 	"strings"
 )
@@ -116,7 +116,7 @@ func (s *Store) Delete(id int) bool {
 func (s *Store) Validate(c Contact) error {
 	for _, v := range s.c {
 		if c.Email == v.Email {
-			return fmt.Errorf("Email must be unique")
+			return errors.New("Email must be unique")
 		}
 	}
 

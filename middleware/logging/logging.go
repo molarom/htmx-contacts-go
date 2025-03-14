@@ -49,7 +49,7 @@ func (rw *statusWriter) WriteHeader(code int) {
 
 func (rw *statusWriter) Write(b []byte) (int, error) {
 	if !rw.written {
-		rw.WriteHeader(200)
+		rw.WriteHeader(http.StatusOK)
 	}
 	return rw.ResponseWriter.Write(b)
 }

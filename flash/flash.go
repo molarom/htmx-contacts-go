@@ -15,7 +15,7 @@ func store() sessions.Store {
 func Add(w http.ResponseWriter, r *http.Request, value string) {
 	session, _ := store().Get(r, sessionName)
 	session.AddFlash(value)
-	session.Save(r, w)
+	_ = session.Save(r, w)
 }
 
 func Messages(w http.ResponseWriter, r *http.Request) []string {
@@ -23,7 +23,7 @@ func Messages(w http.ResponseWriter, r *http.Request) []string {
 
 	m := session.Flashes()
 	if len(m) > 0 {
-		sessions.Save(r, w)
+		_ = session.Save(r, w)
 		sl := make([]string, 0, len(m))
 
 		for _, v := range m {

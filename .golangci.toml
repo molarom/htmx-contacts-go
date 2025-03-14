@@ -1,0 +1,29 @@
+[run]
+timeout = '5m'
+
+[linters]
+enable = [
+    'asciicheck',
+    'dogsled',
+    'errcheck',
+    'errorlint',
+    'gofumpt',
+    'goimports',
+    'misspell',
+    'nakedret',
+    'nilerr',
+    'nolintlint',
+    'prealloc',
+    'perfsprint',
+    'revive',
+    'usestdlibvars',
+    'wastedassign',
+]
+
+[linters-settings]
+
+    [[linters-settings.revive.rules]]
+    name = 'var-naming'
+    severity = 'warning'
+    arguments = [["ID"], [""]]
+

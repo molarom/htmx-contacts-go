@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -19,7 +20,7 @@ func init() {
 	validate = validator.New(validator.WithRequiredStructEnabled())
 	uni, _ = ut.New(en.New(), en.New()).GetTranslator("en")
 
-	en_translations.RegisterDefaultTranslations(validate, uni)
+	_ = en_translations.RegisterDefaultTranslations(validate, uni)
 }
 
 type Errs map[string]string
@@ -35,8 +36,9 @@ func (errs Errs) Error() string {
 
 func Verify(val any) error {
 	if err := validate.Struct(val); err != nil {
-		ve, ok := err.(validator.ValidationErrors)
-		if !ok {
+
+		var ve validator.ValidationErrors
+		if ok := errors.As(err, &ve); !ok {
 			return err
 		}
 

@@ -134,7 +134,7 @@ func (h *handlers) Update(ctx context.Context, r *http.Request) error {
 	}
 	uc.Id = int(id)
 
-	h.store.Update(uc)
+	_ = h.store.Update(uc)
 
 	flash.Add(roxi.GetWriter(ctx), r, "Updated Contact!")
 	return roxi.Redirect(ctx, r, "/contacts/view/"+r.PathValue("contact_id"), http.StatusMovedPermanently)
