@@ -8,6 +8,7 @@ import (
 
 	"gitlab.com/romalor/roxi"
 
+	"gitlab.com/romalor/htmx-contacts/archiver"
 	"gitlab.com/romalor/htmx-contacts/flash"
 	"gitlab.com/romalor/htmx-contacts/middleware/htmx"
 	"gitlab.com/romalor/htmx-contacts/stores/contacts"
@@ -166,6 +167,16 @@ func (h *handlers) Deletes(ctx context.Context, r *http.Request) error {
 	}
 	flash.Add(roxi.GetWriter(ctx), r, "Deleted Contacts!")
 
+	return h.tpls.Render(roxi.GetWriter(ctx), "index.html", tpl.Data{
+		"flashes":  flash.Messages(roxi.GetWriter(ctx), r),
+		"contacts": h.store.Page(1),
+		"page":     1,
+	})
+}
+
+func (h *handlers) Archive(ctx context.Context, r *http.Request) error {
+	a := new(archiver.Archiver)
+	go a.Run(ctx)
 	return h.tpls.Render(roxi.GetWriter(ctx), "index.html", tpl.Data{
 		"flashes":  flash.Messages(roxi.GetWriter(ctx), r),
 		"contacts": h.store.Page(1),

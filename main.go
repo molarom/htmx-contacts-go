@@ -40,7 +40,6 @@ func appConfig() app.Config {
 func RunRoxiServer() {
 	log := slog.New(slog.Default().Handler()).Info
 	mux := roxi.NewWithDefaults(
-		roxi.WithLogger(log),
 		roxi.WithOptionsHandler(roxi.DefaultCORS),
 		roxi.WithMiddleware(
 			logging.Logging(log),

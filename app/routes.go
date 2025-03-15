@@ -19,6 +19,7 @@ func Routes(mux *roxi.Mux, cfg Config) {
 	}
 	mux.GET("/", h.Home)
 	mux.GET("/contacts", h.List)
+	mux.POST("/contacts/archive", h.Archive)
 	mux.GET("/contacts/count", h.Count)
 	mux.GET("/contacts/new", h.New)
 	mux.POST("/contacts/new", h.Create)
