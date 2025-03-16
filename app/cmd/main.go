@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"log/slog"
 	"net/http"
@@ -9,7 +8,7 @@ import (
 
 	"gitlab.com/romalor/roxi"
 
-	"gitlab.com/romalor/htmx-contacts/app"
+	"gitlab.com/romalor/htmx-contacts/app/routes/contacts"
 	"gitlab.com/romalor/htmx-contacts/pkg/debug"
 	"gitlab.com/romalor/htmx-contacts/pkg/middleware/errs"
 	"gitlab.com/romalor/htmx-contacts/pkg/middleware/htmx"
@@ -19,8 +18,38 @@ import (
 )
 
 func main() {
-	go RunDebugServer()
-	RunRoxiServer()
+	// create the logger.
+	log := slog.New(slog.Default().Handler())
+
+	// add logging to 404 responses.
+	notfound := func(w http.ResponseWriter, r *http.Request) {
+		log.Warn("no route registered", "method", r.Method, "path", r.URL.Path)
+		roxi.HandlerFunc(roxi.NotFound).ServeHTTP(w, r)
+	}
+
+	// create the mux.
+	mux := roxi.NewWithDefaults(
+		roxi.WithOptionsHandler(roxi.DefaultCORS),
+		roxi.WithNotFoundHandler(http.HandlerFunc(notfound)),
+		roxi.WithMiddleware(
+			logging.Logging(log.Info),
+			htmx.HTMX,
+			errs.Errors(log.Error),
+		),
+	)
+
+	// serve static content.
+	mux.FileServer("/static/*file", http.FS(os.DirFS("static")))
+
+	// read config and register routes.
+	app.Routes(mux, appConfig())
+	mux.PrintRoutes()
+
+	// optional pprof handlers.
+	go runServer(debug.Mux(), "9000")
+
+	// run the app.
+	runServer(mux, "8080")
 }
 
 func appConfig() app.Config {
@@ -37,52 +66,17 @@ func appConfig() app.Config {
 	}
 }
 
-func RunRoxiServer() {
-	log := slog.New(slog.Default().Handler())
-	notfound := func(w http.ResponseWriter, r *http.Request) {
-		log.Warn("no route registered", "method", r.Method, "path", r.URL.Path)
-		roxi.HandlerFunc(roxi.NotFound).ServeHTTP(w, r)
-	}
-
-	mux := roxi.NewWithDefaults(
-		roxi.WithOptionsHandler(roxi.DefaultCORS),
-		roxi.WithNotFoundHandler(http.HandlerFunc(notfound)),
-		roxi.WithMiddleware(
-			logging.Logging(log.Info),
-			htmx.HTMX,
-			errs.Errors(log.Error),
-		),
-	)
-
-	mux.FileServer("/static/*file", http.FS(os.DirFS("static")))
-
-	cfg := appConfig()
-	app.Routes(mux, appConfig())
-	mux.PrintTree()
-	fmt.Println("-----------------------")
-	cfg.TplBundle.Print()
-
-	runServer(mux, "8080")
-}
-
-func RunDebugServer() {
-	runServer(debug.Mux(), "9000")
-}
-
 func runServer(h http.Handler, port string) {
 	srv := &http.Server{
 		Addr:    ":" + port,
 		Handler: h,
 	}
 
-	if err := srv.ListenAndServe(); err != nil {
-		handleErr(err)
-	}
+	handleErr(srv.ListenAndServe())
 }
 
 func handleErr(err error) {
 	if err != nil {
-		log.Println(err)
-		os.Exit(-1)
+		log.Fatalln(err)
 	}
 }

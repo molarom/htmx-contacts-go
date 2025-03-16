@@ -1,8 +1,8 @@
 run:
-	go run main.go
+	go run app/cmd/main.go
 
 run-race:
-	go run -race main.go
+	go run -race app/cmd/main.go
 
 tidy:
 	go get -u && go mod tidy && go get -u ./...
