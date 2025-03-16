@@ -6,7 +6,7 @@ import (
 
 	"gitlab.com/romalor/roxi"
 
-	"gitlab.com/romalor/htmx-contacts/middleware/logging"
+	"gitlab.com/romalor/htmx-contacts/pkg/middleware/logging"
 )
 
 func Errors(log logging.Logger) roxi.MiddlewareFunc {

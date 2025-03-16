@@ -4,7 +4,7 @@ import "context"
 
 type ctxKey int
 
-const hxKey ctxKey = iota
+const hxKey ctxKey = 0
 
 func Get(ctx context.Context) HX {
 	v, ok := ctx.Value(hxKey).(HX)

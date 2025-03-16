@@ -7,8 +7,8 @@ import (
 
 	"gitlab.com/romalor/roxi"
 
-	"gitlab.com/romalor/htmx-contacts/stores/contacts"
-	"gitlab.com/romalor/htmx-contacts/validator"
+	"gitlab.com/romalor/htmx-contacts/pkg/stores/contacts"
+	"gitlab.com/romalor/htmx-contacts/pkg/validator"
 )
 
 // ----------------------------------------------------------------------

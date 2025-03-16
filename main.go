@@ -10,12 +10,12 @@ import (
 	"gitlab.com/romalor/roxi"
 
 	"gitlab.com/romalor/htmx-contacts/app"
-	"gitlab.com/romalor/htmx-contacts/debug"
-	"gitlab.com/romalor/htmx-contacts/middleware/errs"
-	"gitlab.com/romalor/htmx-contacts/middleware/htmx"
-	"gitlab.com/romalor/htmx-contacts/middleware/logging"
-	"gitlab.com/romalor/htmx-contacts/stores/contacts"
-	"gitlab.com/romalor/htmx-contacts/tpl"
+	"gitlab.com/romalor/htmx-contacts/pkg/debug"
+	"gitlab.com/romalor/htmx-contacts/pkg/middleware/errs"
+	"gitlab.com/romalor/htmx-contacts/pkg/middleware/htmx"
+	"gitlab.com/romalor/htmx-contacts/pkg/middleware/logging"
+	"gitlab.com/romalor/htmx-contacts/pkg/stores/contacts"
+	"gitlab.com/romalor/htmx-contacts/pkg/tpl"
 )
 
 func main() {

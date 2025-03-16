@@ -5,7 +5,7 @@ import (
 	"math/rand"
 	"time"
 
-	"gitlab.com/romalor/htmx-contacts/atomic"
+	"gitlab.com/romalor/htmx-contacts/pkg/atomic"
 )
 
 var a = &Archiver{

@@ -122,3 +122,20 @@ func (s *Store) Validate(c Contact) error {
 
 	return nil
 }
+
+func (s *Store) Save(fileName string) error {
+	f, err := os.Create(fileName)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	e := json.NewEncoder(f)
+	e.SetIndent("", "  ")
+
+	if err := e.Encode(s.c); err != nil {
+		return err
+	}
+
+	return nil
+}

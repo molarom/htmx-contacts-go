@@ -8,10 +8,10 @@ import (
 
 	"gitlab.com/romalor/roxi"
 
-	"gitlab.com/romalor/htmx-contacts/archiver"
-	"gitlab.com/romalor/htmx-contacts/flash"
-	"gitlab.com/romalor/htmx-contacts/stores/contacts"
-	"gitlab.com/romalor/htmx-contacts/tpl"
+	"gitlab.com/romalor/htmx-contacts/pkg/archiver"
+	"gitlab.com/romalor/htmx-contacts/pkg/flash"
+	"gitlab.com/romalor/htmx-contacts/pkg/stores/contacts"
+	"gitlab.com/romalor/htmx-contacts/pkg/tpl"
 )
 
 type handlers struct {

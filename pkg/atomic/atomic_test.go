@@ -3,7 +3,7 @@ package atomic_test
 import (
 	"testing"
 
-	"gitlab.com/romalor/htmx-contacts/atomic"
+	"gitlab.com/romalor/htmx-contacts/pkg/atomic"
 )
 
 func Test_String(t *testing.T) {
