@@ -14,6 +14,12 @@ table {
     margin-bottom: 12px;
 }
 
+@media (prefers-color-scheme: dark) {
+    #spinner {
+        filter: invert(1) brightness(2);
+    }
+}
+
 .error {
     display: inline-block;
     color: darkred;
@@ -28,7 +34,7 @@ td {
     vertical-align: middle;
 }
 
-#download-ui {
+#archive-ui {
     margin-bottom: 16px;
 }
 
