@@ -3,7 +3,9 @@ package app
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
+	"os"
 	"strconv"
 
 	"gitlab.com/romalor/roxi"
@@ -25,33 +27,40 @@ func (h *handlers) Home(ctx context.Context, r *http.Request) error {
 }
 
 func (h *handlers) List(ctx context.Context, r *http.Request) error {
-	pg := r.URL.Query().Get("page")
-	if pg == "" {
-		pg = "1"
+	qp := r.URL.Query()
+	search := qp.Get("q")
+	page := "1"
+	if p := qp.Get("page"); p == "" {
+		page = "1"
 	}
 
-	p, err := strconv.Atoi(pg)
+	p, err := strconv.Atoi(page)
 	if err != nil {
 		return err
 	}
 
 	var contacts contacts.Contacts
-	if q := r.URL.Query().Get("q"); q != "" {
+	if q := qp.Get("q"); q != "" {
 		contacts = h.store.Search(q)
-		if htmx.Get(ctx).Trigger == "search" {
-			return h.tpls.Render(roxi.GetWriter(ctx), "rows.html", tpl.Data{
-				"flashes":  flash.Messages(roxi.GetWriter(ctx), r),
-				"contacts": contacts,
-				"page":     p,
-			})
-		}
 	} else {
 		contacts = h.store.Page(p)
 	}
+
+	if htmx.Get(ctx).Trigger == "search" {
+		return h.tpls.Render(roxi.GetWriter(ctx), "rows.html", tpl.Data{
+			"flashes":  flash.Messages(roxi.GetWriter(ctx), r),
+			"search":   search,
+			"contacts": contacts,
+			"page":     p,
+			"archiver": archiver.Default(),
+		})
+	}
 	return h.tpls.Render(roxi.GetWriter(ctx), "index.html", tpl.Data{
 		"flashes":  flash.Messages(roxi.GetWriter(ctx), r),
+		"search":   search,
 		"contacts": contacts,
 		"page":     p,
+		"archiver": archiver.Default(),
 	})
 }
 
@@ -175,11 +184,37 @@ func (h *handlers) Deletes(ctx context.Context, r *http.Request) error {
 }
 
 func (h *handlers) Archive(ctx context.Context, r *http.Request) error {
-	a := new(archiver.Archiver)
-	go a.Run(ctx)
-	return h.tpls.Render(roxi.GetWriter(ctx), "index.html", tpl.Data{
+	go archiver.Default().Run()
+	return h.tpls.Render(roxi.GetWriter(ctx), "archive_ui.html", tpl.Data{
 		"flashes":  flash.Messages(roxi.GetWriter(ctx), r),
 		"contacts": h.store.Page(1),
 		"page":     1,
+		"archiver": archiver.Default(),
 	})
+}
+
+func (h *handlers) Status(ctx context.Context, r *http.Request) error {
+	return h.tpls.Render(roxi.GetWriter(ctx), "archive_ui.html", tpl.Data{
+		"flashes":  flash.Messages(roxi.GetWriter(ctx), r),
+		"contacts": h.store.Page(1),
+		"page":     1,
+		"archiver": archiver.Default(),
+	})
+}
+
+func (h *handlers) ArchiveFile(ctx context.Context, r *http.Request) error {
+	f, err := os.Open(archiver.Default().File())
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	w := roxi.GetWriter(ctx)
+	w.Header().Set("Content-Disposition", "attachment; filename=archive.json")
+
+	if _, err := io.Copy(w, f); err != nil {
+		return err
+	}
+
+	return nil
 }

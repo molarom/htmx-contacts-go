@@ -11,6 +11,9 @@ import (
 	"gitlab.com/romalor/htmx-contacts/validator"
 )
 
+// ----------------------------------------------------------------------
+// Requests
+
 func parseCreateForm(r *http.Request) (contacts.Contact, error) {
 	c := contacts.Contact{
 		First: r.FormValue("first_name"),
@@ -23,12 +26,6 @@ func parseCreateForm(r *http.Request) (contacts.Contact, error) {
 		return contacts.Contact{}, err
 	}
 	return c, nil
-}
-
-type Resp []byte
-
-func (r Resp) Response() ([]byte, string, error) {
-	return r, "text/plain; charset=utf-8", nil
 }
 
 type deletesParams struct {
@@ -61,4 +58,13 @@ func parseDeletesParams(r *http.Request) (deletesParams, error) {
 	}
 
 	return p, nil
+}
+
+// ----------------------------------------------------------------------
+// Responses
+
+type Resp []byte
+
+func (r Resp) Response() ([]byte, string, error) {
+	return r, "text/plain; charset=utf-8", nil
 }
