@@ -106,16 +106,16 @@
   },
   {
     "id": 18,
-    "first": null,
-    "last": null,
-    "phone": null,
+    "first": "Rest",
+    "last": "Example",
+    "phone": "",
     "email": "restexample1@example.com"
   },
   {
     "id": 19,
-    "first": null,
-    "last": null,
-    "phone": null,
+    "first": "Rest",
+    "last": "Example",
+    "phone": "",
     "email": "restexample2@example.com"
   }
 ]
