@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"log/slog"
 	"net/http"
@@ -44,11 +45,14 @@ func main() {
 	// read config and register routes.
 	app.Routes(mux, appConfig())
 	mux.PrintRoutes()
+	fmt.Println("------------------")
 
 	// optional pprof handlers.
 	go runServer(debug.Mux(), "9000")
+	log.Info("debug mux started", "port", 9000)
 
 	// run the app.
+	log.Info("app has started", "url", "http://localhost:8080")
 	runServer(mux, "8080")
 }
 

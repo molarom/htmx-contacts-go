@@ -3,7 +3,7 @@ package app
 import (
 	"gitlab.com/romalor/roxi"
 
-	"gitlab.com/romalor/htmx-contacts/app/archive"
+	"gitlab.com/romalor/htmx-contacts/app/routes/contacts/archive"
 	"gitlab.com/romalor/htmx-contacts/pkg/stores/contacts"
 	"gitlab.com/romalor/htmx-contacts/pkg/tpl"
 )
