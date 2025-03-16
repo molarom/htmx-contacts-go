@@ -34,7 +34,7 @@ func Routes(mux *roxi.Mux, cfg Config) {
 	mux.GET("/contacts/new", h.New)
 	mux.POST("/contacts/new", h.Create)
 	mux.GET("/contacts/email", h.Email)
-	mux.GET("/contacts/view/:contact_id", h.View)
+	mux.GET("/contacts/:contact_id/view", h.View)
 
 	// Edits
 	mux.GET("/contacts/:contact_id/edit", h.Edit)

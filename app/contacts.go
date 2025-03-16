@@ -145,7 +145,7 @@ func (h *handlers) Update(ctx context.Context, r *http.Request) error {
 	_ = h.store.Update(uc)
 
 	flash.Add(roxi.GetWriter(ctx), r, "Updated Contact!")
-	return roxi.Redirect(ctx, r, "/contacts/view/"+r.PathValue("contact_id"), http.StatusMovedPermanently)
+	return roxi.Redirect(ctx, r, "/contacts/"+r.PathValue("contact_id")+"/view", http.StatusMovedPermanently)
 }
 
 func (h *handlers) Delete(ctx context.Context, r *http.Request) error {
