@@ -38,13 +38,19 @@ func appConfig() app.Config {
 }
 
 func RunRoxiServer() {
-	log := slog.New(slog.Default().Handler()).Info
+	log := slog.New(slog.Default().Handler())
+	notfound := func(w http.ResponseWriter, r *http.Request) {
+		log.Warn("no route registered", "method", r.Method, "path", r.URL.Path)
+		roxi.HandlerFunc(roxi.NotFound).ServeHTTP(w, r)
+	}
+
 	mux := roxi.NewWithDefaults(
 		roxi.WithOptionsHandler(roxi.DefaultCORS),
+		roxi.WithNotFoundHandler(http.HandlerFunc(notfound)),
 		roxi.WithMiddleware(
-			logging.Logging(log),
+			logging.Logging(log.Info),
 			htmx.HTMX,
-			errs.Errors(log),
+			errs.Errors(log.Error),
 		),
 	)
 
