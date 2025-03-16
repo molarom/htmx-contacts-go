@@ -54,3 +54,13 @@ func (h *handlers) ArchiveFile(ctx context.Context, r *http.Request) error {
 
 	return nil
 }
+
+func (h *handlers) Reset(ctx context.Context, r *http.Request) error {
+	archiver.Default().Reset()
+	return h.tpls.Render(roxi.GetWriter(ctx), "archive_ui.html", tpl.Data{
+		"flashes":  flash.Messages(roxi.GetWriter(ctx), r),
+		"contacts": h.store.Page(1),
+		"page":     1,
+		"archiver": archiver.Default(),
+	})
+}

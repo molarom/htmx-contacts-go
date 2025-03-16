@@ -11,12 +11,13 @@
                 class="progress-bar"
                 role="progressbar"
                 aria-valuenow="{{ mul .archiver.Progress 100 }}"
-                style="width:{{ mul .archiver.Progress 100 }}%"></div>
+                style="width: {{ mul .archiver.Progress 100 }}%"></div>
             </div>
         </div>
     {{ else if eq .archiver.Status "Complete" }}
         <a hx-boost="false" href="/contacts/archive/file">
             Archive Ready! Click here to download. &downarrow;
         </a>
+        <button hx-delete="/contacts/archive">Clear Download</button> 
     {{ end }}
 </div>

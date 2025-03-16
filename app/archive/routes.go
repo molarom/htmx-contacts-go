@@ -22,4 +22,5 @@ func Routes(mux *roxi.Mux, cfg Config) {
 	mux.GET("/contacts/archive", h.Status)
 	mux.POST("/contacts/archive", h.Archive)
 	mux.GET("/contacts/archive/file", h.ArchiveFile)
+	mux.DELETE("/contacts/archive", h.Reset)
 }
