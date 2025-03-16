@@ -2,10 +2,7 @@ package app
 
 import (
 	"context"
-	"fmt"
-	"io"
 	"net/http"
-	"os"
 	"strconv"
 
 	"gitlab.com/romalor/roxi"
@@ -65,8 +62,9 @@ func (h *handlers) List(ctx context.Context, r *http.Request) error {
 }
 
 func (h *handlers) Count(ctx context.Context, r *http.Request) error {
-	resp := Resp(fmt.Sprintf("(%d total Contacts)", h.store.Count()))
-	return roxi.Respond(ctx, resp)
+	return roxi.Respond(ctx,
+		Resp("("+strconv.Itoa(h.store.Count())+" total Contacts)"),
+	)
 }
 
 func (h *handlers) New(ctx context.Context, r *http.Request) error {
@@ -181,40 +179,4 @@ func (h *handlers) Deletes(ctx context.Context, r *http.Request) error {
 		"contacts": h.store.Page(1),
 		"page":     1,
 	})
-}
-
-func (h *handlers) Archive(ctx context.Context, r *http.Request) error {
-	go archiver.Default().Run()
-	return h.tpls.Render(roxi.GetWriter(ctx), "archive_ui.html", tpl.Data{
-		"flashes":  flash.Messages(roxi.GetWriter(ctx), r),
-		"contacts": h.store.Page(1),
-		"page":     1,
-		"archiver": archiver.Default(),
-	})
-}
-
-func (h *handlers) Status(ctx context.Context, r *http.Request) error {
-	return h.tpls.Render(roxi.GetWriter(ctx), "archive_ui.html", tpl.Data{
-		"flashes":  flash.Messages(roxi.GetWriter(ctx), r),
-		"contacts": h.store.Page(1),
-		"page":     1,
-		"archiver": archiver.Default(),
-	})
-}
-
-func (h *handlers) ArchiveFile(ctx context.Context, r *http.Request) error {
-	f, err := os.Open(archiver.Default().File())
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	w := roxi.GetWriter(ctx)
-	w.Header().Set("Content-Disposition", "attachment; filename=archive.json")
-
-	if _, err := io.Copy(w, f); err != nil {
-		return err
-	}
-
-	return nil
 }
