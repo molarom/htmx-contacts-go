@@ -1,52 +1,67 @@
 package archiver
 
 import (
-	"context"
 	"fmt"
 	"math/rand"
-	"strconv"
 	"time"
+
+	"gitlab.com/romalor/htmx-contacts/atomic"
 )
 
-var a = new(Archiver)
+var a = &Archiver{
+	status:   new(atomic.String),
+	progress: new(atomic.Float64),
+}
 
 type Archiver struct {
-	status   string
-	progress int
+	status   *atomic.String
+	progress *atomic.Float64
 }
 
 func Default() *Archiver {
+	if a.status.Value() != "" {
+		return a
+	}
+	a.status.Set("Waiting")
 	return a
 }
 
 func (a *Archiver) Status() string {
-	return a.status
+	return a.status.Value()
 }
 
-func (a *Archiver) Progress() int {
-	return a.progress
+func (a *Archiver) Progress() float64 {
+	return a.progress.Value()
 }
 
-func (a *Archiver) Run(ctx context.Context) {
+func (a *Archiver) Run() {
+	if a.status.Value() == "Waiting" {
+		a.status.Set("Running")
+		a.progress.Set(0)
+		go a.run()
+	}
+}
+
+func (a *Archiver) run() {
 	for i := 0; i < 10; i++ {
 		time.Sleep(time.Second * time.Duration(rand.Intn(2)))
-		if a.status != "Running" {
+		if a.status.Value() != "Running" {
 			return
 		}
-		a.progress = (i + 1) / 10
-		fmt.Print("Here..." + strconv.Itoa(a.progress))
+		a.progress.Set(float64(i) / float64(10))
+		fmt.Println("Here...", a.progress.Value())
 	}
 	time.Sleep(time.Second * 1)
-	if a.status != "Running" {
+	if a.status.Value() != "Running" {
 		return
 	}
-	a.status = "Complete"
+	a.status.Set("Complete")
 }
 
 func (a *Archiver) Reset() {
-	a.status = "Waiting"
+	a.status.Set("Waiting")
 }
 
-func File() string {
+func (a *Archiver) File() string {
 	return "contacts.json"
 }
