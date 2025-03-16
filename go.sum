@@ -28,6 +28,10 @@ github.com/rogpeppe/go-internal v1.11.0 h1:cWPaGQEPrBb5/AsnsZesgZZ9yb1OQ+GOISoDN
 github.com/rogpeppe/go-internal v1.11.0/go.mod h1:ddIwULY96R17DhadqLgMfk9H9tvdUzkipdSkR5nkCZA=
 github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
 github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
+gitlab.com/romalor/radix v1.0.0 h1:RbXPrmibdPk8Z2AAX3uZDk5vReXaVs/vQkAp9EfqosA=
+gitlab.com/romalor/radix v1.0.0/go.mod h1:eGBqhW3WeCegZlNXyobrAlrMN7cDUw4G4IvZOZk2vnU=
+gitlab.com/romalor/roxi v1.1.0 h1:g8zdtenpQId03Z+vU2XxIvKiDA7ogigbVbi7nCUJHWQ=
+gitlab.com/romalor/roxi v1.1.0/go.mod h1:kqnyZgfRb9tPFLSFLcjoocRYR/1nzaUDG4hGjZQSGPg=
 golang.org/x/crypto v0.36.0 h1:AnAEvhDddvBdpY+uR+MyHmuZzzNqXSe/GvuDeob5L34=
 golang.org/x/crypto v0.36.0/go.mod h1:Y4J0ReaxCR1IMaabaSMugxJES1EpwhBHhv2bDHklZvc=
 golang.org/x/net v0.37.0 h1:1zLorHbz+LYj7MQlSf1+2tPIIgibq2eL5xkrGk6f+2c=
