@@ -1,17 +1,25 @@
 {{ range $v := .contacts }}
 <tr>
-    <td><input type="checkbox" name="selected_contact_ids" value="{{ $v.Id }}"></td>
+    <td><input type="checkbox" name="selected_contact_ids" value="{{ $v.Id }}" 
+            x-model="selected"></td>
     <td>{{ $v.First }}</td>
     <td>{{ $v.Last }}</td>
     <td>{{ $v.Phone }}</td>
     <td>{{ $v.Email }}</td>
     <td>
-        <a href="/contacts/{{ $v.Id }}/edit">Edit</a>
-        <a href="/contacts/view/{{ $v.Id }}">View</a>
-        <a href="#" hx-delete="/contacts/{{ $v.Id }}"
-            hx-swap="outerHTML swap:1s"
-            hx-confirm="Are you sure you want to delete this contact?"
-            hx-target="closest tr">Delete</a>
+        <div data-overflow-menu>
+            <button type="button" 
+                aria-haspopup="menu"
+                aria-controls="contact-menu-{{ $v.Id }}">Options</button>
+            <div role="menu" hidden id="contact-menu-{{ $v.Id }}">
+                <a role="menuitem" href="/contacts/{{ $v.Id }}/edit">Edit</a> 
+                <a role="menuitem" href="/contacts/{{ $v.Id }}/view">View</a>
+                <a role="menuitem" href="#" hx-delete="/contacts/{{ $v.Id }}"
+                    hx-swap="outerHTML swap:1s"
+                    hx-confirm="Are you sure you want to delete this contact?"
+                    hx-target="closest tr">Delete</a>
+            </div>
+        </div>
     </td>
 </tr>
 {{ end }}
