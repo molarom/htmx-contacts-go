@@ -19,7 +19,6 @@ func Mux() *roxi.Mux {
 
 	viz, _ := statsviz.NewServer()
 	mux.GET("/debug/statsviz/*filepath", func(ctx context.Context, r *http.Request) error {
-		r.SetPathValue("filepath", "/"+r.PathValue("filepath"))
 		if r.PathValue("filepath") == "/ws" {
 			viz.Ws().ServeHTTP(roxi.GetWriter(ctx), r)
 		} else {
