@@ -1,12 +1,6 @@
 package app
 
 import (
-	"net/http"
-	"net/url"
-	"strconv"
-
-	"gitlab.com/romalor/roxi"
-
 	"gitlab.com/romalor/htmx-contacts/pkg/stores/contacts"
 	"gitlab.com/romalor/htmx-contacts/pkg/validator"
 )
@@ -14,51 +8,64 @@ import (
 // ----------------------------------------------------------------------
 // Requests
 
-func parseCreateForm(r *http.Request) (contacts.Contact, error) {
-	c := contacts.Contact{
-		First: r.FormValue("first_name"),
-		Last:  r.FormValue("last_name"),
-		Phone: r.FormValue("phone"),
-		Email: r.FormValue("email"),
-	}
+type listRequest struct {
+	// Headers
+	Trigger string `header:"hx-trigger"`
 
-	if err := validator.Verify(c); err != nil {
-		return contacts.Contact{}, err
-	}
-	return c, nil
+	// Query Params
+	Page int `query:"page"`
+	Search string `query:"q"`
+
 }
 
-type deletesParams struct {
-	ids []int
-}
-
-func (c *deletesParams) Bind(data []byte) error {
-	q, err := url.ParseQuery(string(data))
-	if err != nil {
-		return err
-	}
-
-	p := q["selected_contact_ids"]
-
-	c.ids = make([]int, 0, len(p))
-	for _, v := range p {
-		i, err := strconv.ParseInt(v, 10, 64)
-		if err != nil {
-			return err
-		}
-		c.ids = append(c.ids, int(i))
+func (r *listRequest) Validate() error {
+	if r.Page < 1 {
+		r.Page = 1
 	}
 	return nil
 }
 
-func parseDeletesParams(r *http.Request) (deletesParams, error) {
-	p := deletesParams{}
-	if err := roxi.Bind(r, &p); err != nil {
-		return deletesParams{}, err
-	}
-
-	return p, nil
+type createRequest struct {
+	First string `form:"first_name" validate:"required"`
+	Last  string `form:"last_name" validate:"required"`
+	Phone string `form:"phone" validate:"required"`
+	Email string `form:"email" validate:"required,email"`
 }
+
+func (r *createRequest) Validate() error {
+	return validator.Verify(r)
+}
+
+func (r *createRequest) toContact() contacts.Contact {
+	return contacts.Contact{
+		First: r.First,
+		Last: r.Last,
+		Phone: r.Phone,
+		Email: r.Email,
+	}
+}
+
+type updateRequest struct {
+	Id int `path:"contact_id"`
+	createRequest
+}
+
+func (r *updateRequest) toContact() contacts.Contact {
+	return contacts.Contact{
+		Id: r.Id,
+		First: r.First,
+		Last: r.Last,
+		Phone: r.Phone,
+		Email: r.Email,
+	}
+}
+
+type deleteRequest struct {
+	Trigger string `header:"hx-trigger"`
+	ContactId int `path:"contact_id"`
+	Ids []int `query:"selected_contact_ids"`
+}
+
 
 // ----------------------------------------------------------------------
 // Responses
@@ -68,3 +75,4 @@ type Resp []byte
 func (r Resp) Response() ([]byte, string, error) {
 	return r, "text/plain; charset=utf-8", nil
 }
+

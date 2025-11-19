@@ -9,10 +9,10 @@ import (
 
 type Contact struct {
 	Id    int    `json:"id"`
-	First string `json:"first" validate:"required"`
-	Last  string `json:"last" validate:"required"`
-	Phone string `json:"phone" validate:"required"`
-	Email string `json:"email" validate:"required,email"`
+	First string `json:"first" `
+	Last  string `json:"last" `
+	Phone string `json:"phone" `
+	Email string `json:"email" `
 }
 
 type Contacts []Contact

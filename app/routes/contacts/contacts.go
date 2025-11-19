@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"strconv"
 
+	"gitlab.com/romalor/rika"
 	"gitlab.com/romalor/roxi"
 
 	"gitlab.com/romalor/htmx-contacts/pkg/archiver"
 	"gitlab.com/romalor/htmx-contacts/pkg/flash"
-	"gitlab.com/romalor/htmx-contacts/pkg/middleware/htmx"
 	"gitlab.com/romalor/htmx-contacts/pkg/stores/contacts"
 	"gitlab.com/romalor/htmx-contacts/pkg/tpl"
 )
@@ -24,39 +24,28 @@ func (h *handlers) Home(ctx context.Context, r *http.Request) error {
 }
 
 func (h *handlers) List(ctx context.Context, r *http.Request) error {
-	qp := r.URL.Query()
-	search := qp.Get("q")
-	page := "1"
-	if p := qp.Get("page"); p == "" {
-		page = "1"
-	}
-
-	p, err := strconv.Atoi(page)
-	if err != nil {
-		return err
+	var req listRequest
+	if err := rika.Bind(r, &req); err != nil {
+		return rika.BadRequest(err.Error())
 	}
 
 	var contacts contacts.Contacts
-	if q := qp.Get("q"); q != "" {
-		contacts = h.store.Search(q)
+	if req.Search != "" {
+		contacts = h.store.Search(req.Search)
 	} else {
-		contacts = h.store.Page(p)
+		contacts = h.store.Page(req.Page)
 	}
 
-	if htmx.Get(ctx).Trigger == "search" {
-		return h.tpls.Render(roxi.GetWriter(ctx), "rows.html", tpl.Data{
-			"flashes":  flash.Messages(roxi.GetWriter(ctx), r),
-			"search":   search,
-			"contacts": contacts,
-			"page":     p,
-			"archiver": archiver.Default(),
-		})
+	template := "index.html"
+	if req.Trigger == "search" {
+		template = "rows.html"
 	}
-	return h.tpls.Render(roxi.GetWriter(ctx), "index.html", tpl.Data{
+
+	return h.tpls.Render(roxi.GetWriter(ctx), template, tpl.Data{
 		"flashes":  flash.Messages(roxi.GetWriter(ctx), r),
-		"search":   search,
+		"search":   req.Search,
+		"page":     req.Page,
 		"contacts": contacts,
-		"page":     p,
 		"archiver": archiver.Default(),
 	})
 }
@@ -75,17 +64,17 @@ func (h *handlers) New(ctx context.Context, r *http.Request) error {
 }
 
 func (h *handlers) Create(ctx context.Context, r *http.Request) error {
-	c, err := parseCreateForm(r)
-	if err != nil {
+	var req createRequest
+	if err := rika.Bind(r, &req); err != nil {
 		return h.tpls.Render(roxi.GetWriter(ctx), "new.html", tpl.Data{
-			"contact": contacts.Contact{},
-			"errors":  err,
+			"contact": req,
+			"errors": err,
 		})
 	}
 
-	if err := h.store.Create(c); err != nil {
+	if err := h.store.Create(req.toContact()); err != nil {
 		return h.tpls.Render(roxi.GetWriter(ctx), "new.html", tpl.Data{
-			"contact": c,
+			"contact": req,
 			"errors":  map[string]error{"Email": err},
 		})
 	}
@@ -128,34 +117,28 @@ func (h *handlers) Edit(ctx context.Context, r *http.Request) error {
 }
 
 func (h *handlers) Update(ctx context.Context, r *http.Request) error {
-	id, err := strconv.ParseInt(r.PathValue("contact_id"), 10, 64)
-	if err != nil {
-		return err
-	}
-
-	uc, err := parseCreateForm(r)
-	if err != nil {
+	var req updateRequest
+	if err := rika.Bind(r, &req); err != nil {
 		return h.tpls.Render(roxi.GetWriter(ctx), "edit.html", tpl.Data{
 			"contact": contacts.Contact{},
 			"error":   err,
 		})
 	}
-	uc.Id = int(id)
 
-	_ = h.store.Update(uc)
+	_ = h.store.Update(req.toContact())
 
 	flash.Add(roxi.GetWriter(ctx), r, "Updated Contact!")
 	return roxi.Redirect(ctx, r, "/contacts/"+r.PathValue("contact_id")+"/view", http.StatusMovedPermanently)
 }
 
 func (h *handlers) Delete(ctx context.Context, r *http.Request) error {
-	id, err := strconv.ParseInt(r.PathValue("contact_id"), 10, 64)
-	if err != nil {
+	var req deleteRequest
+	if err := rika.Bind(r, &req); err != nil {
 		return err
 	}
 
-	if htmx.Get(ctx).Trigger == "delete-btn" {
-		if ok := h.store.Delete(int(id)); ok {
+	if req.Trigger == "delete-btn" {
+		if ok := h.store.Delete(req.ContactId); ok {
 			flash.Add(roxi.GetWriter(ctx), r, "Deleted Contact!")
 		}
 		return roxi.Redirect(ctx, r, "/contacts/", http.StatusSeeOther)
@@ -164,12 +147,12 @@ func (h *handlers) Delete(ctx context.Context, r *http.Request) error {
 }
 
 func (h *handlers) Deletes(ctx context.Context, r *http.Request) error {
-	qp, err := parseDeletesParams(r)
-	if err != nil {
+	var req deleteRequest
+	if err := rika.Bind(r, &req); err != nil {
 		return err
 	}
 
-	for _, id := range qp.ids {
+	for _, id := range req.Ids {
 		_ = h.store.Delete(id)
 	}
 	flash.Add(roxi.GetWriter(ctx), r, "Deleted Contacts!")

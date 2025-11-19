@@ -8,7 +8,6 @@ require (
 	github.com/go-playground/universal-translator v0.18.1
 	github.com/go-playground/validator/v10 v10.25.0
 	github.com/gorilla/sessions v1.4.0
-	gitlab.com/romalor/radix v1.0.0
 	gitlab.com/romalor/roxi v1.1.0
 )
 
