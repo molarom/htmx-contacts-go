@@ -1,6 +1,9 @@
 package archive
 
 import (
+	"os"
+
+	"gitlab.com/romalor/rika"
 	"gitlab.com/romalor/roxi"
 
 	"gitlab.com/romalor/htmx-contacts/pkg/stores/contacts"
@@ -16,6 +19,7 @@ func Routes(mux *roxi.Mux, cfg Config) {
 	h := &handlers{
 		cfg.TplBundle,
 		cfg.Store,
+		rika.NewFileResponder(os.DirFS(".")),
 	}
 
 	// Archive

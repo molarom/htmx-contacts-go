@@ -1,7 +1,6 @@
 package archiver
 
 import (
-	"fmt"
 	"math/rand"
 	"time"
 
@@ -49,7 +48,6 @@ func (a *Archiver) run() {
 			return
 		}
 		a.progress.Set(float64(i) / float64(10))
-		fmt.Println("Here...", a.progress.Value())
 	}
 	time.Sleep(time.Second * 1)
 	if a.status.Value() != "Running" {

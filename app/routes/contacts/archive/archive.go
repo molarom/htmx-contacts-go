@@ -2,10 +2,9 @@ package archive
 
 import (
 	"context"
-	"io"
 	"net/http"
-	"os"
 
+	"gitlab.com/romalor/rika"
 	"gitlab.com/romalor/roxi"
 
 	"gitlab.com/romalor/htmx-contacts/pkg/archiver"
@@ -17,6 +16,7 @@ import (
 type handlers struct {
 	tpls  *tpl.Bundle
 	store *contacts.Store
+	fr *rika.FileResponder
 }
 
 func (h *handlers) Archive(ctx context.Context, r *http.Request) error {
@@ -39,20 +39,7 @@ func (h *handlers) Status(ctx context.Context, r *http.Request) error {
 }
 
 func (h *handlers) ArchiveFile(ctx context.Context, r *http.Request) error {
-	f, err := os.Open(archiver.Default().File())
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	w := roxi.GetWriter(ctx)
-	w.Header().Set("Content-Disposition", "attachment; filename=archive.json")
-
-	if _, err := io.Copy(w, f); err != nil {
-		return err
-	}
-
-	return nil
+	return h.fr.Attachment(ctx, r, archiver.Default().File())
 }
 
 func (h *handlers) Reset(ctx context.Context, r *http.Request) error {
