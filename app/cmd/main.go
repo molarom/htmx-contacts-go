@@ -1,12 +1,13 @@
 package main
 
 import (
+	"context"
 	"log"
-	"log/slog"
 	"net/http"
 	"os"
 
 	"gitlab.com/romalor/rika"
+	"gitlab.com/romalor/rika/logger"
 
 	"gitlab.com/romalor/htmx-contacts/app/routes/contacts"
 	"gitlab.com/romalor/htmx-contacts/pkg/debug"
@@ -15,9 +16,8 @@ import (
 )
 
 func main() {
-	// create the logger.
-	log := slog.New(slog.Default().Handler())
 
+	// create rika instance
 	srv := rika.New()
 
 	// serve static content.
@@ -28,7 +28,7 @@ func main() {
 
 	// optional pprof handlers.
 	go runServer(debug.Mux(), "9000")
-	log.Info("debug mux started", "port", 9000)
+	srv.Logger().Info(context.Background(),"debug mux started", logger.Field("port", 9000))
 
 	_ = srv.Start(":8080")	
 }
