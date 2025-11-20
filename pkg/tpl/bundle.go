@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
-	"maps"
 	"net/http"
 	"path/filepath"
 	"sync"
@@ -22,36 +21,11 @@ type Bundle struct {
 // Data represents the data to be rendered for a template.
 type Data map[string]any
 
-// Option is a functional option for configuring a Bundle.
-type Option func(*Bundle) error
-
-// WithBaseTpl sets the base template name that other templates extend.
-func WithBaseTpl(name string) Option {
-	return func(b *Bundle) error {
-		if name == "" {
-			return fmt.Errorf("base template name cannot be empty")
-		}
-		b.base = name
-		return nil
-	}
-}
-
-// WithFuncs adds custom template functions.
-func WithFuncs(funcMap template.FuncMap) Option {
-	return func(b *Bundle) error {
-		if b.funcs == nil {
-			b.funcs = make(template.FuncMap)
-		}
-
-		maps.Copy(b.funcs, funcMap)
-		return nil
-	}
-}
 
 // NewBundle creates a new bundle of templates with the given options.
 //
-// The viewsDir is a glob pattern for view templates (e.g., "views/*.html").
-// The sharedDirs are glob patterns for shared/partial templates.
+// The viewsDir is a glob pattern for templates considered to be primary pages (e.g., "views/*.html").
+// The sharedDirs are glob patterns for shared component templates.
 func NewBundle(viewsDir string, sharedDirs []string, opts ...Option) (*Bundle, error) {
 	b := &Bundle{
 		base:      "base", // default base template name
@@ -101,7 +75,7 @@ func (b *Bundle) load(viewsDir string, sharedDirs []string) error {
 		allShared = append(allShared, shared...)
 	}
 
-	// Parse view templates (with shared templates as dependencies)
+	// Parse view templates 
 	for _, viewPath := range views {
 		name := filepath.Base(viewPath)
 		files := append([]string{viewPath}, allShared...)
